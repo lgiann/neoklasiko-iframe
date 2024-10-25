@@ -8,16 +8,15 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
             color: black; /* Black text color */
         }
         #distance-info {
             padding: 15px;
             border: 1px solid #ccc;
-            background-color: #fff;
             margin-top: 20px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: white; /* Changed to white background */
         }
         .distance-item {
             display: flex;
@@ -66,7 +65,7 @@
 
                     data.elements.forEach(element => {
                         const elementLocation = L.latLng(element.lat, element.lon);
-                        const distance = propertyLocation.distanceTo(elementLocation) / 1000; // Convert to kilometers
+                        const distance = propertyLocation.distanceTo(elementLocation); // Distance in meters
 
                         if (element.tags && element.tags.amenity === 'school') {
                             distances.school = (distances.school === null) ? distance : Math.min(distances.school, distance);
@@ -100,15 +99,15 @@
                     <h4>Αποστάσεις από την Ιδιοκτησία</h4>
                     <div class="distance-item">
                         <i class="fas fa-school"></i>
-                        <p>Σχολείο: ${distances.school !== null ? distances.school.toFixed(2) + ' χλμ' : 'Δεν βρέθηκε'}</p>
+                        <p>Σχολείο: ${distances.school !== null ? distances.school.toFixed(0) + ' μ' : 'Δεν βρέθηκε'}</p>
                     </div>
                     <div class="distance-item">
                         <i class="fas fa-shopping-cart"></i>
-                        <p>Σούπερ Μάρκετ: ${distances.supermarket !== null ? distances.supermarket.toFixed(2) + ' χλμ' : 'Δεν βρέθηκε'}</p>
+                        <p>Σούπερ Μάρκετ: ${distances.supermarket !== null ? distances.supermarket.toFixed(0) + ' μ' : 'Δεν βρέθηκε'}</p>
                     </div>
                     <div class="distance-item">
                         <i class="fas fa-subway"></i>
-                        <p>Σταθμός Μετρό: ${distances.subway !== null ? distances.subway.toFixed(2) + ' χλμ' : 'Δεν βρέθηκε'}</p>
+                        <p>Σταθμός Μετρό: ${distances.subway !== null ? distances.subway.toFixed(0) + ' μ' : 'Δεν βρέθηκε'}</p>
                     </div>
                 `;
                 document.getElementById('distance-info').innerHTML = distanceBoxHTML; // Add the box to the container
