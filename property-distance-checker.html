@@ -21,7 +21,7 @@
     <div id="distance-info"></div>
 
     <script>
-        // Fetch distance data based on coordinates
+        // Function to fetch distance data based on coordinates
         function fetchDistanceData(latitude, longitude) {
             const apiUrl = 'https://overpass-api.de/api/interpreter?data=[out:json];';
             const query = `
@@ -31,7 +31,12 @@
                 out;`;
 
             return fetch(apiUrl + query)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     let distances = {
                         school: null,
@@ -55,15 +60,25 @@
                     });
 
                     return distances;
+                })
+                .catch(error => {
+                    console.error('Error fetching distance data:', error);
                 });
         }
 
-        // Extract coordinates and fetch distances
-        window.addEventListener('load', function() {
+        // Wait 1000ms before executing the following code
+        setTimeout(() => {
             const mapElement = document.getElementById('g5ere_single_map671ba9795fea1');
+            if (!mapElement) {
+                console.error("Map element not found. Please check the selector.");
+                return;
+            }
             const locationData = JSON.parse(mapElement.getAttribute('data-location'));
             const latitude = locationData.position.lat;  // Extract latitude
             const longitude = locationData.position.lng;  // Extract longitude
+
+            console.log("Extracted Latitude:", latitude);
+            console.log("Extracted Longitude:", longitude);
 
             // Fetch distances based on the extracted coordinates
             fetchDistanceData(latitude, longitude).then(distances => {
@@ -75,7 +90,7 @@
                 `;
                 document.getElementById('distance-info').innerHTML = distanceBoxHTML; // Add the box to the container
             });
-        });
+        }, 1000); // 1000ms delay before execution
     </script>
 </body>
 </html>
