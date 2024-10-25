@@ -5,33 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: black; /* Black text color */
+        }
+        #distance-info {
+            padding: 15px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .distance-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .distance-item i {
+            margin-right: 10px; /* Space between icon and text */
+            font-size: 20px; /* Adjust icon size */
+            color: #32e7c0; /* Main color for icons */
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 </head>
 <body>
     <div id="g5ere_single_map671ba9795fea1" class="g5ere__map-canvas" data-location='{"position":{"lat":"37.9767857621902","lng":"23.74618113040924"}}'></div>
+    
     <div id="distance-info"></div>
 
     <script>
-        // Wait for 1 second before executing
-        setTimeout(() => {
-            const mapElement = document.getElementById('g5ere_single_map671ba9795fea1');
-            const locationData = JSON.parse(mapElement.getAttribute('data-location'));
-            const latitude = locationData.position.lat;
-            const longitude = locationData.position.lng;
-
-            console.log("Latitude:", latitude, "Longitude:", longitude);
-
-            fetchDistanceData(latitude, longitude).then(distances => {
-                const distanceBoxHTML = `
-                    <h4>Distances from Property</h4>
-                    <p>School: ${distances.school !== null ? distances.school.toFixed(2) + ' km' : 'Not found'}</p>
-                    <p>Supermarket: ${distances.supermarket !== null ? distances.supermarket.toFixed(2) + ' km' : 'Not found'}</p>
-                    <p>Subway Station: ${distances.subway !== null ? distances.subway.toFixed(2) + ' km' : 'Not found'}</p>
-                `;
-                document.getElementById('distance-info').innerHTML = distanceBoxHTML;
-            });
-        }, 1000);
-
-        // Fetch distance data
+        // Fetch distance data based on coordinates
         function fetchDistanceData(latitude, longitude) {
             const apiUrl = 'https://overpass-api.de/api/interpreter?data=[out:json];';
             const query = `
@@ -76,6 +83,37 @@
                     console.error('Error fetching distance data:', error);
                 });
         }
+
+        // Wait for 1 second before executing the following code
+        setTimeout(() => {
+            const mapElement = document.getElementById('g5ere_single_map671ba9795fea1');
+            const locationData = JSON.parse(mapElement.getAttribute('data-location'));
+            const latitude = locationData.position.lat;  // Extract latitude
+            const longitude = locationData.position.lng;  // Extract longitude
+
+            console.log("Extracted Latitude:", latitude);
+            console.log("Extracted Longitude:", longitude);
+
+            // Fetch distances based on the extracted coordinates
+            fetchDistanceData(latitude, longitude).then(distances => {
+                const distanceBoxHTML = `
+                    <h4>Αποστάσεις από την Ιδιοκτησία</h4>
+                    <div class="distance-item">
+                        <i class="fas fa-school"></i>
+                        <p>Σχολείο: ${distances.school !== null ? distances.school.toFixed(2) + ' χλμ' : 'Δεν βρέθηκε'}</p>
+                    </div>
+                    <div class="distance-item">
+                        <i class="fas fa-shopping-cart"></i>
+                        <p>Σούπερ Μάρκετ: ${distances.supermarket !== null ? distances.supermarket.toFixed(2) + ' χλμ' : 'Δεν βρέθηκε'}</p>
+                    </div>
+                    <div class="distance-item">
+                        <i class="fas fa-subway"></i>
+                        <p>Σταθμός Μετρό: ${distances.subway !== null ? distances.subway.toFixed(2) + ' χλμ' : 'Δεν βρέθηκε'}</p>
+                    </div>
+                `;
+                document.getElementById('distance-info').innerHTML = distanceBoxHTML; // Add the box to the container
+            });
+        }, 1000); // 1000ms delay before execution
     </script>
 </body>
 </html>
