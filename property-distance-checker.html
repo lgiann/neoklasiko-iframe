@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+        #distance-info {
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            margin-top: 20px;
+            color: #32e7c0; /* Main color */
+        }
+    </style>
+</head>
+<body>
+    <!-- Replace these values with actual property coordinates -->
+    <input type="hidden" id="property-latitude" value="40.730610"> <!-- Example latitude -->
+    <input type="hidden" id="property-longitude" value="-73.935242"> <!-- Example longitude -->
+    <div id="distance-info"></div>
+
+    <script>
+        const apiUrl = 'https://overpass-api.de/api/interpreter?data=[out:json];';
+
+        function fetchDistanceData(latitude, longitude) {
+            const query = `
+                (node["amenity"="school"](around:1000, ${latitude}, ${longitude});
+                node["shop"="supermarket"](around:1000, ${latitude}, ${longitude});
+                node["railway"="subway_station"](around:1000, ${latitude}, ${longitude}););
+                out;`;
+
+            return fetch(apiUrl + query)
+                .then(response => response.json())
+                .then(data => {
+                    let distances = {
+                        school: null,
+                        supermarket: null,
+                        subway: null,
+                    };
+
+                    const propertyLocation = L.latLng(latitude, longitude);
+
+                    data.elements.forEach(element => {
+                        const elementLocation = L.latLng(element.lat, element.lon);
+                        const distance = propertyLocation.distanceTo(elementLocation) / 1000; // Convert to kilometers
+
+                        if (element.tags && element.tags.amenity === 'school') {
+                            distances.school = (distances.school === null) ? distance : Math.min(distances.school, distance);
+                        } else if (element.tags && element.tags.shop === 'supermarket') {
+                            distances.supermarket = (distances.supermarket === null) ? distance : Math.min(distances.supermarket, distance);
+                        } else if (element.tags && element.tags.railway === 'subway_station') {
+                            distances.subway = (distances.subway === null) ? distance : Math.min(distances.subway, distance);
+                        }
+                    });
+
+                    return distances;
+                });
+        }
+
+        function createDistanceBox(distances) {
+            return `
+                <h4>Distances from Property</h4>
+                <p>School: ${distances.school !== null ? distances.school.toFixed(2) + ' km' : 'Not found'}</p>
+                <p>Supermarket: ${distances.supermarket !== null ? distances.supermarket.toFixed(2) + ' km' : 'Not found'}</p>
+                <p>Subway Station: ${distances.subway !== null ? distances.subway.toFixed(2) + ' km' : 'Not found'}</p>
+            `;
+        }
+
+        window.addEventListener('load', function() {
+            const latitude = parseFloat(document.getElementById('property-latitude').value); // Get latitude
+            const longitude = parseFloat(document.getElementById('property-longitude').value); // Get longitude
+
+            fetchDistanceData(latitude, longitude).then(distances => {
+                const distanceBoxHTML = createDistanceBox(distances);
+                document.getElementById('distance-info').innerHTML = distanceBoxHTML; // Add the box to the container
+            });
+        });
+    </script>
+</body>
+</html>
