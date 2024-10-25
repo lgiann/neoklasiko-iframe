@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400&display=swap" rel="stylesheet"> <!-- Link for Comfortaa -->
     <style>
         body {
-            font-family: 'Comfortaa', sans-serif!important; /* Set font family */
+            font-family: 'Comfortaa', sans-serif; /* Set font family */
             background-color: white; /* Set background color to white */
             color: black; /* Black text color */
             margin: 0; /* Remove default margin */
@@ -32,6 +32,7 @@
             color: #32e7c0; /* Main color for icons */
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 </head>
 <body>
     <div id="g5ere_single_map671ba9795fea1" class="g5ere__map-canvas" data-location='{"position":{"lat":"37.9767857621902","lng":"23.74618113040924"}}'></div>
@@ -85,36 +86,34 @@
                 });
         }
 
-        // Wait for 1 second before executing the following code
-        setTimeout(() => {
-            const mapElement = document.getElementById('g5ere_single_map671ba9795fea1');
-            const locationData = JSON.parse(mapElement.getAttribute('data-location'));
-            const latitude = locationData.position.lat;  // Extract latitude
-            const longitude = locationData.position.lng;  // Extract longitude
+        // Execute immediately on load
+        const mapElement = document.getElementById('g5ere_single_map671ba9795fea1');
+        const locationData = JSON.parse(mapElement.getAttribute('data-location'));
+        const latitude = locationData.position.lat;  // Extract latitude
+        const longitude = locationData.position.lng;  // Extract longitude
 
-            console.log("Extracted Latitude:", latitude);
-            console.log("Extracted Longitude:", longitude);
+        console.log("Extracted Latitude:", latitude);
+        console.log("Extracted Longitude:", longitude);
 
-            // Fetch distances based on the extracted coordinates
-            fetchDistanceData(latitude, longitude).then(distances => {
-                const distanceBoxHTML = `
-                    <h4>Αποστάσεις από την Ιδιοκτησία</h4>
-                    <div class="distance-item">
-                        <i class="fas fa-school"></i>
-                        <p>Σχολείο: ${distances.school !== null ? distances.school.toFixed(0) + ' μ' : 'Δεν βρέθηκε'}</p>
-                    </div>
-                    <div class="distance-item">
-                        <i class="fas fa-shopping-cart"></i>
-                        <p>Σούπερ Μάρκετ: ${distances.supermarket !== null ? distances.supermarket.toFixed(0) + ' μ' : 'Δεν βρέθηκε'}</p>
-                    </div>
-                    <div class="distance-item">
-                        <i class="fas fa-subway"></i>
-                        <p>Σταθμός Μετρό: ${distances.subway !== null ? distances.subway.toFixed(0) + ' μ' : 'Δεν βρέθηκε'}</p>
-                    </div>
-                `;
-                document.getElementById('distance-info').innerHTML = distanceBoxHTML; // Add the box to the container
-            });
-        }, 1000); // 1000ms delay before execution
+        // Fetch distances based on the extracted coordinates
+        fetchDistanceData(latitude, longitude).then(distances => {
+            const distanceBoxHTML = `
+                <h4>Αποστάσεις από την Ιδιοκτησία</h4>
+                <div class="distance-item">
+                    <i class="fas fa-school"></i>
+                    <p>Σχολείο: ${distances.school !== null ? distances.school.toFixed(0) + ' μ' : 'Δεν βρέθηκε'}</p>
+                </div>
+                <div class="distance-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Σούπερ Μάρκετ: ${distances.supermarket !== null ? distances.supermarket.toFixed(0) + ' μ' : 'Δεν βρέθηκε'}</p>
+                </div>
+                <div class="distance-item">
+                    <i class="fas fa-subway"></i>
+                    <p>Σταθμός Μετρό: ${distances.subway !== null ? distances.subway.toFixed(0) + ' μ' : 'Δεν βρέθηκε'}</p>
+                </div>
+            `;
+            document.getElementById('distance-info').innerHTML = distanceBoxHTML; // Add the box to the container
+        });
     </script>
 </body>
 </html>
