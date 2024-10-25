@@ -5,23 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <style>
-        #distance-info {
-            padding: 10px;
-            border: 1px solid #ccc;
-            background-color: #f9f9f9;
-            margin-top: 20px;
-            color: #32e7c0; /* Main color */
-        }
-    </style>
 </head>
 <body>
     <div id="g5ere_single_map671ba9795fea1" class="g5ere__map-canvas" data-location='{"position":{"lat":"37.9767857621902","lng":"23.74618113040924"}}'></div>
-    
     <div id="distance-info"></div>
 
     <script>
-        // Function to fetch distance data based on coordinates
+        // Wait for 1 second before executing
+        setTimeout(() => {
+            const mapElement = document.getElementById('g5ere_single_map671ba9795fea1');
+            const locationData = JSON.parse(mapElement.getAttribute('data-location'));
+            const latitude = locationData.position.lat;
+            const longitude = locationData.position.lng;
+
+            console.log("Latitude:", latitude, "Longitude:", longitude);
+
+            fetchDistanceData(latitude, longitude).then(distances => {
+                const distanceBoxHTML = `
+                    <h4>Distances from Property</h4>
+                    <p>School: ${distances.school !== null ? distances.school.toFixed(2) + ' km' : 'Not found'}</p>
+                    <p>Supermarket: ${distances.supermarket !== null ? distances.supermarket.toFixed(2) + ' km' : 'Not found'}</p>
+                    <p>Subway Station: ${distances.subway !== null ? distances.subway.toFixed(2) + ' km' : 'Not found'}</p>
+                `;
+                document.getElementById('distance-info').innerHTML = distanceBoxHTML;
+            });
+        }, 1000);
+
+        // Fetch distance data
         function fetchDistanceData(latitude, longitude) {
             const apiUrl = 'https://overpass-api.de/api/interpreter?data=[out:json];';
             const query = `
@@ -33,7 +43,8 @@
             return fetch(apiUrl + query)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Network response was not ok: ' + response.statusText);
+                        console.error('Network response was not ok:', response.statusText);
+                        throw new Error('Network response was not ok');
                     }
                     return response.json();
                 })
@@ -65,32 +76,6 @@
                     console.error('Error fetching distance data:', error);
                 });
         }
-
-        // Wait 1000ms before executing the following code
-        setTimeout(() => {
-            const mapElement = document.getElementById('g5ere_single_map671ba9795fea1');
-            if (!mapElement) {
-                console.error("Map element not found. Please check the selector.");
-                return;
-            }
-            const locationData = JSON.parse(mapElement.getAttribute('data-location'));
-            const latitude = locationData.position.lat;  // Extract latitude
-            const longitude = locationData.position.lng;  // Extract longitude
-
-            console.log("Extracted Latitude:", latitude);
-            console.log("Extracted Longitude:", longitude);
-
-            // Fetch distances based on the extracted coordinates
-            fetchDistanceData(latitude, longitude).then(distances => {
-                const distanceBoxHTML = `
-                    <h4>Distances from Property</h4>
-                    <p>School: ${distances.school !== null ? distances.school.toFixed(2) + ' km' : 'Not found'}</p>
-                    <p>Supermarket: ${distances.supermarket !== null ? distances.supermarket.toFixed(2) + ' km' : 'Not found'}</p>
-                    <p>Subway Station: ${distances.subway !== null ? distances.subway.toFixed(2) + ' km' : 'Not found'}</p>
-                `;
-                document.getElementById('distance-info').innerHTML = distanceBoxHTML; // Add the box to the container
-            });
-        }, 1000); // 1000ms delay before execution
     </script>
 </body>
 </html>
