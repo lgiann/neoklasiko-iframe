@@ -16,15 +16,14 @@
     </style>
 </head>
 <body>
-    <!-- Replace these values with actual property coordinates -->
-    <input type="hidden" id="property-latitude" value="40.730610"> <!-- Example latitude -->
-    <input type="hidden" id="property-longitude" value="-73.935242"> <!-- Example longitude -->
+    <div id="g5ere_single_map671ba9795fea1" class="g5ere__map-canvas" data-location='{"position":{"lat":"37.9767857621902","lng":"23.74618113040924"}}'></div>
+    
     <div id="distance-info"></div>
 
     <script>
-        const apiUrl = 'https://overpass-api.de/api/interpreter?data=[out:json];';
-
+        // Fetch distance data based on coordinates
         function fetchDistanceData(latitude, longitude) {
+            const apiUrl = 'https://overpass-api.de/api/interpreter?data=[out:json];';
             const query = `
                 (node["amenity"="school"](around:1000, ${latitude}, ${longitude});
                 node["shop"="supermarket"](around:1000, ${latitude}, ${longitude});
@@ -59,21 +58,21 @@
                 });
         }
 
-        function createDistanceBox(distances) {
-            return `
-                <h4>Distances from Property</h4>
-                <p>School: ${distances.school !== null ? distances.school.toFixed(2) + ' km' : 'Not found'}</p>
-                <p>Supermarket: ${distances.supermarket !== null ? distances.supermarket.toFixed(2) + ' km' : 'Not found'}</p>
-                <p>Subway Station: ${distances.subway !== null ? distances.subway.toFixed(2) + ' km' : 'Not found'}</p>
-            `;
-        }
-
+        // Extract coordinates and fetch distances
         window.addEventListener('load', function() {
-            const latitude = parseFloat(document.getElementById('property-latitude').value); // Get latitude
-            const longitude = parseFloat(document.getElementById('property-longitude').value); // Get longitude
+            const mapElement = document.getElementById('g5ere_single_map671ba9795fea1');
+            const locationData = JSON.parse(mapElement.getAttribute('data-location'));
+            const latitude = locationData.position.lat;  // Extract latitude
+            const longitude = locationData.position.lng;  // Extract longitude
 
+            // Fetch distances based on the extracted coordinates
             fetchDistanceData(latitude, longitude).then(distances => {
-                const distanceBoxHTML = createDistanceBox(distances);
+                const distanceBoxHTML = `
+                    <h4>Distances from Property</h4>
+                    <p>School: ${distances.school !== null ? distances.school.toFixed(2) + ' km' : 'Not found'}</p>
+                    <p>Supermarket: ${distances.supermarket !== null ? distances.supermarket.toFixed(2) + ' km' : 'Not found'}</p>
+                    <p>Subway Station: ${distances.subway !== null ? distances.subway.toFixed(2) + ' km' : 'Not found'}</p>
+                `;
                 document.getElementById('distance-info').innerHTML = distanceBoxHTML; // Add the box to the container
             });
         });
